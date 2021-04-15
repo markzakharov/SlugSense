@@ -22,14 +22,14 @@ BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Servic
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
 BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 
-const int ledPin = LED_BUILTIN; // pin to use for the LED
+const int ledPin = 12; // pin to use for the LED
 
 void setup() {
   Serial.begin(9600);
   while (!Serial);
 
   // set LED pin to output mode
-  pinMode(ledPin, OUTPUT);
+  //pinMode(ledPin, OUTPUT);
 
   // begin initialization
   if (!BLE.begin()) {
@@ -71,6 +71,15 @@ void loop() {
     while (central.connected()) {
       // if the remote device wrote to the characteristic,
       // use the value to control the LED:
+      
+      Serial.println("LED on");
+      switchCharacteristic.writeValue((byte)0x01);
+      delay(1000);
+      Serial.println("LED off");
+      switchCharacteristic.writeValue((byte)0x00);
+      delay(1000);
+
+      /*
       if (switchCharacteristic.written()) {
         if (switchCharacteristic.value()) {   // any value other than 0
           Serial.println("LED on");
@@ -80,6 +89,7 @@ void loop() {
           digitalWrite(ledPin, LOW);          // will turn the LED off
         }
       }
+      */
     }
 
     // when the central disconnects, print it out:

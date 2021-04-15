@@ -16,18 +16,16 @@
 
 #include <ArduinoBLE.h>
 
-void setup() {
-  //Serial.begin(9600);
-  //while (!Serial);
+byte value = 0;
+const int ledPin = 12; // pin to use for the LED
 
+void setup() {
   // begin initialization
   if (!BLE.begin()) {
-    //Serial.println("starting BLE failed!");
-
     while (1);
   }
 
-  //Serial.println("BLE Central - Peripheral Explorer");
+  Serial.println("BLE Central - Peripheral Explorer");
 
   // start scanning for peripherals
   BLE.scan();
@@ -38,7 +36,8 @@ void loop() {
   BLEDevice peripheral = BLE.available();
 
   if (peripheral) {
-    /* discovered a peripheral, print out address, local name, and advertised service
+    /*
+    // discovered a peripheral, print out address, local name, and advertised service
     Serial.print("Found ");
     Serial.print(peripheral.address());
     Serial.print(" '");
@@ -54,57 +53,51 @@ void loop() {
 
       explorerPeripheral(peripheral);
 
-      // peripheral disconnected, we are done
-      while (1) {
-        // do nothing
-      }
+      while(1){}
     }
+    
   }
 }
 
+
 void explorerPeripheral(BLEDevice peripheral) {
   // connect to the peripheral
-  //Serial.println("Connecting ...");
+  Serial.println("Connecting ...");
 
   if (peripheral.connect()) {
-    //Serial.println("Connected");
+    Serial.println("Connected");
+
+      BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
+      while (peripheral.connected()) {
+        //Serial.println("Connected");
+        //if (ledCharacteristic.valueUpdated()) {
+          //ledCharacteristic.value();
+          if (ledCharacteristic.written()) {
+          if (ledCharacteristic.value()) {
+            Serial.println("Write High");
+            //digitalWrite(ledPin, HIGH);
+          } else {
+            Serial.println("Write Low");
+            //digitalWrite(ledPin, LOW);
+          }
+          }
+        //}
+      }
+    
   } else {
     //Serial.println("Failed to connect!");
     return;
   }
 
-  // discover peripheral attributes
-  //Serial.println("Discovering attributes ...");
-  if (peripheral.discoverAttributes()) {
-    //Serial.println("Attributes discovered");
-  } else {
-    //Serial.println("Attribute discovery failed!");
-    peripheral.disconnect();
-    return;
-  }
-
-  /*// read and print device name of peripheral
-  Serial.println();
-  Serial.print("Device name: ");
-  Serial.println(peripheral.deviceName());
-  Serial.print("Appearance: 0x");
-  Serial.println(peripheral.appearance(), HEX);
-  Serial.println();
-  */
-  // loop the services of the peripheral and explore each
-  for (int i = 0; i < peripheral.serviceCount(); i++) {
-    BLEService service = peripheral.service(i);
-
-    exploreService(service);
-  }
-  
-  Serial.println();
-
   // we are done exploring, disconnect
   //Serial.println("Disconnecting ...");
-  peripheral.disconnect();
+  //peripheral.disconnect();
   //Serial.println("Disconnected");
 }
+
+
+/*
+
 
 void exploreService(BLEService service) {
   // print the UUID of the service
@@ -120,12 +113,12 @@ void exploreService(BLEService service) {
 }
 
 void exploreCharacteristic(BLECharacteristic characteristic) {
-  /*// print the UUID and properties of the characteristic
-  Serial.print("\tCharacteristic ");
-  Serial.print(characteristic.uuid());
-  Serial.print(", properties 0x");
-  Serial.print(characteristic.properties(), HEX);
-  */
+  // print the UUID and properties of the characteristic
+  //Serial.print("\tCharacteristic ");
+  //Serial.print(characteristic.uuid());
+  //Serial.print(", properties 0x");
+  //Serial.print(characteristic.properties(), HEX);
+  
   // check if the characteristic is readable
   if (characteristic.canRead()) {
     // read the characteristic value
@@ -173,3 +166,6 @@ void printData(const unsigned char data[], int length) {
     //Serial.print(b, HEX);
   }
 }
+
+
+*/
