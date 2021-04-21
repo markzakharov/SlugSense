@@ -72,13 +72,16 @@ void explorerPeripheral(BLEDevice peripheral) {
         //Serial.println("Connected");
         //if (ledCharacteristic.valueUpdated()) {
           //ledCharacteristic.value();
-          if (ledCharacteristic.value()) {
+          BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
+          int var = (int) ledCharacteristic.value();
+          Serial.print(var);
+          /*if (ledCharacteristic.value()) {
             Serial.println("Write High");
             //digitalWrite(ledPin, HIGH);
           } else {
             Serial.println("Write Low");
             //digitalWrite(ledPin, LOW);
-          }
+          }*/
         //}
       }
     
