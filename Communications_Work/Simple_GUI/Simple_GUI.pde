@@ -10,6 +10,8 @@ PFont font;
 
 void setup() {  // same as Arduino program
 
+
+
   size(900, 1000);  // window size (width, height)
   
   printArray(Serial.list());  // prints all available serial ports
@@ -52,6 +54,9 @@ void setup() {  // same as Arduino program
 }
 
 void draw() {  // same as loop in Arduino
+  
+ 
+
   
   background(103, 24, 49);  // background color of window (r,g,b)
   
