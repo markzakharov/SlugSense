@@ -49,9 +49,7 @@ void setup() {
   BLE.addService(ledService);
 
   // set the initial value for the characeristic:
-  switchCharacteristic.writeValue(0x01);
-  int var = (int) switchCharacteristic.value();
-  Serial.print(var);
+  switchCharacteristic.writeValue(0x00);
 
   // start advertising
   BLE.advertise();
@@ -76,9 +74,13 @@ void loop() {
       
       Serial.println("LED on");
       switchCharacteristic.writeValue((byte)0x01);
+      int var = (int) switchCharacteristic.value();
+      Serial.println(var);
       //delay(1000);
       Serial.println("LED off");
       switchCharacteristic.writeValue((byte)0x02);
+      var = (int) switchCharacteristic.value();
+      Serial.println(var);
       //delay(1000);
 
       /*

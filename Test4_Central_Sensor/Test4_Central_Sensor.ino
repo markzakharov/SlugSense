@@ -36,16 +36,6 @@ void loop() {
   BLEDevice peripheral = BLE.available();
 
   if (peripheral) {
-    /*
-    // discovered a peripheral, print out address, local name, and advertised service
-    Serial.print("Found ");
-    Serial.print(peripheral.address());
-    Serial.print(" '");
-    Serial.print(peripheral.localName());
-    Serial.print("' ");
-    Serial.print(peripheral.advertisedServiceUuid());
-    Serial.println();
-    */
     // see if peripheral is a LED
     if (peripheral.localName() == "LED") {
       // stop scanning
@@ -67,12 +57,9 @@ void explorerPeripheral(BLEDevice peripheral) {
   if (peripheral.connect()) {
     Serial.println("Connected");
 
-      BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
+      BLEByteCharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
       while (peripheral.connected()) {
-        //Serial.println("Connected");
-        //if (ledCharacteristic.valueUpdated()) {
-          //ledCharacteristic.value();
-          BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
+          //BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
           int var = (int) ledCharacteristic.value();
           Serial.print(var);
           /*if (ledCharacteristic.value()) {
@@ -82,7 +69,6 @@ void explorerPeripheral(BLEDevice peripheral) {
             Serial.println("Write Low");
             //digitalWrite(ledPin, LOW);
           }*/
-        //}
       }
     
   } else {
