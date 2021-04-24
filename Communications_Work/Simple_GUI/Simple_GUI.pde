@@ -1,6 +1,8 @@
 import controlP5.*;  // import ControlP5 library
 import processing.serial.*;
 
+// this program creates buttons to control Arduino Nana BLE 33
+
 Serial port;
 
 ControlP5 cp5;  // create ControlP5 object

@@ -3,6 +3,8 @@
  #define GREEN 23u
  //#define LED_PWR 25
 
+// this program is to turn on an LED based on input from GUI
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(RED, OUTPUT);
