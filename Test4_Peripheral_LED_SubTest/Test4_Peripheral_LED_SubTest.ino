@@ -76,11 +76,14 @@ void loop() {
         if (switchCharacteristic.value()%2) {   // any value other than 0
           Serial.println("LED on");
           digitalWrite(ledPin, HIGH);         // will turn the LED on
+          switchCharacteristic.writeValue(1);
         } else {                              // a 0 value
           Serial.println(F("LED off"));
           digitalWrite(ledPin, LOW);          // will turn the LED off
+          switchCharacteristic.writeValue(0);
         }
-        switchCharacteristic.writeValue(switchCharacteristic.value());
+        // switchCharacteristic.writeValue(switchCharacteristic.value());
+        // switchCharacteristic.writeValue(1);
       }
     }
 

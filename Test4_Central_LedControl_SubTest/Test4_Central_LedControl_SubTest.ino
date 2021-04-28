@@ -18,6 +18,10 @@
 
 #include <ArduinoBLE.h>
 
+ #define RED 22     
+ #define BLUE 24  
+ #define GREEN 23
+
 //BLEByteCharacteristic switchCharacteristic("19B10002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 
 // variables for button
@@ -25,7 +29,18 @@ const int buttonPin = 2;
 int oldButtonState = LOW;
 
 void setup() {
+  // put your setup code here, to run once:
+  pinMode(RED, OUTPUT);
+  pinMode(BLUE, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+
   Serial.begin(9600);
+
+  // initialize LEDs
+  digitalWrite(RED, HIGH); 
+  digitalWrite(BLUE, HIGH);
+  digitalWrite(GREEN, HIGH);
+
   while (!Serial);
 
   // configure the button pin as input
@@ -115,7 +130,12 @@ void controlLed(BLEDevice peripheral) {
     var =  var + 1;
 
     ledCharacteristic.readValue(value);
-    Serial.println(value);
+    if(value == 1) {
+      digitalWrite(BLUE, LOW);
+    } else if (value == 0) {
+      digitalWrite(BLUE, HIGH);
+    }
+    // Serial.println(value);
 
     // read the button pin
     //int buttonState = digitalRead(buttonPin);
