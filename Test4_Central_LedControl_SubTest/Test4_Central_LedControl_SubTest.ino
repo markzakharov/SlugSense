@@ -106,7 +106,7 @@ void controlLed(BLEDevice peripheral) {
   }
 
   byte var = 0;
-  int value;
+  uint32_t value;
 
   while (peripheral.connected()) {
     // while the peripheral is connected
@@ -114,9 +114,8 @@ void controlLed(BLEDevice peripheral) {
     ledCharacteristic.writeValue(var);
     var =  var + 1;
 
-    if (ledCharacteristic.valueUpdated()) {
-      Serial.println(ledCharacteristic);
-    }
+    ledCharacteristic.readValue(value);
+    Serial.println(value);
 
     // read the button pin
     //int buttonState = digitalRead(buttonPin);
