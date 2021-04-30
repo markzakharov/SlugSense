@@ -2,7 +2,7 @@
 #define DigitalReadPin 10
 #define MicrosToInches 147  //digital width conversion, 147 microseconds per inch measured
 #define AnalogToInches 2   //Unit conversion of int reading to inches measured
-#define ArrayLength 200
+#define ArrayLength 100
 #define JumpThreshold 75
 #define AvgThreshold 2
 
