@@ -6,3 +6,5 @@ This project was done for the CSE123AB capstone series for UCSC Engineering majo
  Caitlin Tom,
  Yaala Belau,
  Kenzie Milhous,
+ Emma Appleton,
+ Troy Cavalieri
