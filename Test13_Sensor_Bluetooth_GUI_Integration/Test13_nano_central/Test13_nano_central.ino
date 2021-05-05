@@ -106,7 +106,7 @@ void loop() {
 
     // stop scanning
     BLE.stopScan();
-
+    
     controlLed(peripheral);
 
     // peripheral disconnected, start scanning again
@@ -172,8 +172,14 @@ void controlLed(BLEDevice peripheral) {
 
     // ledCharacteristic.writeValue(var);
     // var =  var + 1;
-    if (ledCharacteristic.valueUpdated()) {
+    //if (ledCharacteristic.valueUpdated()) {
+      Serial.print("1 ");
+      Serial.println(micros(),DEC);
+      
       ledCharacteristic.readValue(value);
+      
+      Serial.print("2 ");
+      Serial.println(micros(),DEC);
       
       // SENSOR RUN
       if (micros() - readTime >= ReadIntervalUs) {
@@ -183,8 +189,9 @@ void controlLed(BLEDevice peripheral) {
       if(digitalRead(DigitalReadPin)){  //once pin goes high, enters function
         // DIGITAL WIDTH EVALUATION
         microTime = micros();   //reset inches
-        while(digitalRead(DigitalReadPin)){  //busy wait
-        }
+        readTime = microTime;
+        //while(digitalRead(DigitalReadPin)){  //busy wait
+        //}
         microTime = micros()- microTime;  //sets inches to inches
         inches = (uint32_t) microTime/MicrosToInches;
         //inches_analog = (uint32_t) (analogRead(AnalogReadPin)/AnalogToInches);
@@ -198,23 +205,27 @@ void controlLed(BLEDevice peripheral) {
         }
       
         if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
-          Serial.print(micros(),DEC);
-          Serial.print(" , ");
-          Serial.println(movSum/ArrayLength, DEC);
+          //Serial.print(micros(),DEC);
+          //Serial.print(" , ");
+          //Serial.println(movSum/ArrayLength, DEC);
           
           oldAvg = movSum/ArrayLength;
           cycleCount++;
         }
         else{
-          Serial.print(micros(),DEC);
-          Serial.print(" , ");
-          Serial.println(oldAvg, DEC);
+          //Serial.print(micros(),DEC);
+          //Serial.print(" , ");
+          //Serial.println(oldAvg, DEC);
         }
         
         digitalWrite(RXCmdPin, LOW);
-        readTime = micros();
+        
+        
+        Serial.print("3 ");
+        Serial.println(micros(),DEC);
       }
-    }
+      
+    //}
     // Serial.println(value);
 
     // read the button pin
