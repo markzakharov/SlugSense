@@ -14,7 +14,7 @@ void setup() {  // same as Arduino program
 
 
 
-  size(300, 100);  // window size (width, height)
+  size(300, 150);  // window size (width, height)
   
   printArray(Serial.list());  // prints all available serial ports
   
@@ -63,6 +63,14 @@ void setup() {  // same as Arduino program
     .setNumberOfTickMarks(5)
     // .setValue(50)
     ;
+
+  cp5.addSlider("slider2")
+    .setPosition(50, 90)
+    .setSize(200, 20)
+    .setRange(1, 5)
+    .setNumberOfTickMarks(5)
+    // .setValue(50)
+    ;  
 }
 
 void draw() {  // same as loop in Arduino
@@ -98,6 +106,11 @@ void draw() {  // same as loop in Arduino
 // Slider Functions
 void slider(int slider) {
   port.write(slider);
+  
+}
+
+void slider2(int slider2) {
+  port.write(slider2);
   
 }
 

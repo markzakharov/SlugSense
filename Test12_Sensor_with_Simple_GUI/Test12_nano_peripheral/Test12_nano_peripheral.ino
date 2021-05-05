@@ -22,8 +22,10 @@ BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Servic
 
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
 BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
+BLEByteCharacteristic settingCharacteristic("19B10002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED
+int prevVal = 1;
 
 void setup() {
   Serial.begin(9600);
@@ -45,18 +47,20 @@ void setup() {
 
   // add the characteristic to the service
   ledService.addCharacteristic(switchCharacteristic);
-
+  ledService.addCharacteristic(settingCharacteristic);
   // add service
   BLE.addService(ledService);
 
   // set the initial value for the characeristic:
   switchCharacteristic.writeValue(0);
-
+  settingCharacteristic.writeValue(0);
   // start advertising
   BLE.advertise();
 
   // Serial.println("BLE LED Peripheral");
 }
+
+
 
 void loop() {
   // listen for BLE peripherals to connect:
@@ -89,7 +93,7 @@ void loop() {
 
       if(Serial.available()) {  // if data is available to read
         int val = Serial.read();
-        int prevVal = 1;
+        
         if(val != prevVal){
           prevVal = val;
           switchCharacteristic.writeValue(val);
