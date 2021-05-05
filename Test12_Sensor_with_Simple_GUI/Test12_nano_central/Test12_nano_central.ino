@@ -146,7 +146,7 @@ void controlLed(BLEDevice peripheral) {
 
     // ledCharacteristic.writeValue(var);
     // var =  var + 1;
-    // if (ledCharacteristic.valueUpdated()) {
+    if (ledCharacteristic.valueUpdated()) {
       ledCharacteristic.readValue(value);
       
       if(value != prevValue){
@@ -170,7 +170,7 @@ void controlLed(BLEDevice peripheral) {
           digitalWrite(GREEN, HIGH);
         }
       }
-    // }
+    }
     // Serial.println(value);
 
     // read the button pin
