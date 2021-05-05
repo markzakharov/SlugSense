@@ -18,31 +18,11 @@
 
 #include <ArduinoBLE.h>
 
-// SENSOR DEFINES
-#define DigitalReadPin 10
-#define RXCmdPin 9 // sends control signals to get sensor readings
-#define MicrosToInches 147  //digital width conversion, 147 microseconds per inch measured
-#define ArrayLength 10
-#define JumpThreshold 75
-#define AvgThreshold 2
-#define ReadIntervalUs 100000 // delay between sensor readings (in us)
-
 #define RED 22     
 #define BLUE 24  
 #define GREEN 23
 
 //BLEByteCharacteristic switchCharacteristic("19B10002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
-
-// SENSOR VARIABLES
-unsigned long microTime = 0;
-unsigned long readTime = 0; // time of last reading (in us)
-uint32_t cycleCount = 0;
-
-uint32_t inches = 0;
-uint32_t movAvg[ArrayLength] = {0}; //moving average array
-uint8_t movIndex = 0;      //array index
-uint32_t movSum = 0;         //current array sum
-uint32_t oldAvg = 0;
 
 // variables for button
 const int buttonPin = 2;
@@ -51,12 +31,6 @@ int oldButtonState = LOW;
 int prevValue = 1;
 
 void setup() {
-  // SENSOR INITS
-  Serial.begin(9600);
-  pinMode(DigitalReadPin,INPUT);
-  pinMode(RXCmdPin, OUTPUT);
-  digitalWrite(RXCmdPin, LOW);
-  
   // put your setup code here, to run once:
   pinMode(RED, OUTPUT);
   pinMode(BLUE, OUTPUT);
@@ -173,46 +147,29 @@ void controlLed(BLEDevice peripheral) {
     // ledCharacteristic.writeValue(var);
     // var =  var + 1;
     if (ledCharacteristic.valueUpdated()) {
+      Serial.println("Value updated");
       ledCharacteristic.readValue(value);
       
-      // SENSOR RUN
-      if (micros() - readTime >= ReadIntervalUs) {
-      digitalWrite(RXCmdPin, HIGH);
-      }
-    
-      if(digitalRead(DigitalReadPin)){  //once pin goes high, enters function
-        // DIGITAL WIDTH EVALUATION
-        microTime = micros();   //reset inches
-        while(digitalRead(DigitalReadPin)){  //busy wait
+      if(value != prevValue){
+        prevValue = value;
+        Serial.println(value);
+        if(value == 50) {  // RED ON
+          digitalWrite(RED, LOW);
+          digitalWrite(GREEN, HIGH);
+          digitalWrite(BLUE, HIGH);
+        } else if(value == 100) { // BLUE ON
+          digitalWrite(RED, HIGH);
+          digitalWrite(GREEN, HIGH);
+          digitalWrite(BLUE, LOW);
+        } else if(value == 150) {  // GREEN ON
+          digitalWrite(RED, HIGH);
+          digitalWrite(GREEN, LOW);
+          digitalWrite(BLUE, HIGH);
+        } else if (value == 0) {  // ALL OFF
+          digitalWrite(RED, HIGH);
+          digitalWrite(BLUE, HIGH);
+          digitalWrite(GREEN, HIGH);
         }
-        microTime = micros()- microTime;  //sets inches to inches
-        inches = (uint32_t) microTime/MicrosToInches;
-        //inches_analog = (uint32_t) (analogRead(AnalogReadPin)/AnalogToInches);
-      
-        // Apply digital moving filter
-        if(((movAvg[movIndex]-JumpThreshold) < inches) || ((movAvg[movIndex]+JumpThreshold) > inches) || (movAvg[movIndex]==0)){  //independent reading threshold
-          movSum = movSum - movAvg[movIndex];
-          movAvg[movIndex] = inches;
-          movSum += inches;
-          movIndex = (movIndex+1)%ArrayLength;
-        }
-      
-        if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
-          Serial.print(micros(),DEC);
-          Serial.print(" , ");
-          Serial.println(movSum/ArrayLength, DEC);
-          
-          oldAvg = movSum/ArrayLength;
-          cycleCount++;
-        }
-        else{
-          Serial.print(micros(),DEC);
-          Serial.print(" , ");
-          Serial.println(oldAvg, DEC);
-        }
-        
-        digitalWrite(RXCmdPin, LOW);
-        readTime = micros();
       }
     }
     // Serial.println(value);
