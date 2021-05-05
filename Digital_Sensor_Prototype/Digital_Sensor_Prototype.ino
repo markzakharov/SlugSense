@@ -1,29 +1,21 @@
-#define AnalogReadPin A2
 #define DigitalReadPin 10
-#define RXCmdPin 9 // sends control signals to get sensor readings
-#define MicrosToInches 147  //digital width conversion, 147 microseconds per inch measured
-#define AnalogToInches 2   //Unit conversion of int reading to inches measured
-#define ArrayLength 10
-#define JumpThreshold 75
+#define RXCmdPin 9          // sends control signals to get sensor readings
+#define MicrosToInches 147  // digital width conversion, 147 microseconds per inch measured
+#define AnalogToInches 2    // Unit conversion of int reading to inches measured
+#define ArrayLength 10      // captures 1 sec of sensor readings
+#define JumpThreshold 75    // may need to change to increase/decrease sensitivity
 #define AvgThreshold 2
 #define ReadIntervalUs 100000 // delay between sensor readings (in us)
 
 unsigned long microTime;
 unsigned long readTime = 0; // time of last reading (in us)
-uint32_t cycleCount;
+uint32_t cycleCount;        // number of readings since startup
 
 volatile uint32_t inches;
 uint32_t movAvg[ArrayLength] = {0}; //moving average array
-uint8_t movIndex;      //array index
+uint8_t movIndex;        //array index
 uint32_t movSum;         //current array sum
 uint32_t oldAvg;
-
-volatile uint32_t inches_analog;
-uint32_t movAvg_analog[ArrayLength] = {0}; //moving average array
-uint8_t movIndex_analog;      //array index
-uint32_t movSum_analog;         //current array sum
-uint32_t oldAvg_analog;
-
 
 void setup() {
   Serial.begin(9600);
@@ -36,10 +28,6 @@ void setup() {
   movSum=0;
   oldAvg=0;
   
-  inches_analog=0;
-  movIndex_analog=0;
-  movSum_analog=0;
-  oldAvg_analog=0;
   digitalWrite(RXCmdPin, LOW);
 }
 
