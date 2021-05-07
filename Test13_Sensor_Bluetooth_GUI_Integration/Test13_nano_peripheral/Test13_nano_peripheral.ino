@@ -24,7 +24,7 @@ BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Servic
 BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED
-
+int prevVal = 1;
 void setup() {
   Serial.begin(9600);
   while (!Serial);
@@ -89,7 +89,7 @@ void loop() {
 
       if(Serial.available()) {  // if data is available to read
         int val = Serial.read();
-        int prevVal = 1;
+        
         if(val != prevVal){
           prevVal = val;
           switchCharacteristic.writeValue(val);

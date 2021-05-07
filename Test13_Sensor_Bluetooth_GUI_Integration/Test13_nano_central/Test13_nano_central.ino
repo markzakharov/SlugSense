@@ -188,6 +188,7 @@ void controlLed(BLEDevice peripheral) {
 
 
       if(digitalRead(DigitalReadPin)){  //once pin goes high, enters function
+
         // DIGITAL WIDTH EVALUATION
         microTime = micros();   //reset inches
         readTime = microTime;
@@ -204,19 +205,19 @@ void controlLed(BLEDevice peripheral) {
           movSum += inches;
           movIndex = (movIndex+1)%ArrayLength;
         }
-        Serial.print(micros(),DEC);
-        Serial.print(" , ");
+        //Serial.print(micros(),DEC);
+        //Serial.print(" , ");
         // Prints new result, new result is the sum divided by the array length= movSum/ArrayLength
         if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
-          Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
+          //Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
           oldAvg = movSum/ArrayLength;
           cycleCount++;
         }
         else if ((movSum/ArrayLength) > maxDistance*12){
-          Serial.println("0");                    //new result is out of bounds
+          //Serial.println("0");                    //new result is out of bounds
         }
         else{
-          Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
+          //Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
         }
         
         digitalWrite(RXCmdPin, LOW);
@@ -224,6 +225,7 @@ void controlLed(BLEDevice peripheral) {
         
         //Serial.print("3 ");
         //Serial.println(micros(),DEC);
+        Serial.println(micros() - readTime, DEC);
       }
       
     //}
