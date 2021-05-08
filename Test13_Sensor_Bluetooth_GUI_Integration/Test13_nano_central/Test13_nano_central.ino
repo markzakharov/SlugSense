@@ -164,6 +164,22 @@ void controlLed(BLEDevice peripheral) {
     return;
   }
 
+  // subscribe to the simple key characteristic
+  Serial.println("Subscribing to notify characteristic ...");
+  if (!ledCharacteristic) {
+    Serial.println("no notify characteristic found!");
+    peripheral.disconnect();
+    return;
+  } else if (!ledCharacteristic.canSubscribe()) {
+    Serial.println("notify characteristic is not subscribable!");
+    peripheral.disconnect();
+    return;
+  } else if (!ledCharacteristic.subscribe()) {
+    Serial.println("subscription failed!");
+    peripheral.disconnect();
+    return;
+  }
+
   byte var = 0;
   uint32_t maxDistance=1;
 
@@ -172,12 +188,13 @@ void controlLed(BLEDevice peripheral) {
 
     // ledCharacteristic.writeValue(var);
     // var =  var + 1;
-    //if (ledCharacteristic.valueUpdated()) {
+    if (ledCharacteristic.valueUpdated()) {
       //Serial.print("1 ");
       //Serial.println(micros(),DEC);
-      
-      //ledCharacteristic.readValue(maxDistance);
-      
+      // Serial.print("Value updated: ");
+      ledCharacteristic.readValue(maxDistance);
+      // Serial.println(maxDistance);
+    }  
       //Serial.print("2 ");
       //Serial.println(micros(),DEC);
       
@@ -224,8 +241,8 @@ void controlLed(BLEDevice peripheral) {
         
         
         
-        //Serial.print("3 ");
-        //Serial.println(micros(),DEC);
+        // Serial.print("3 ");
+        // Serial.println(micros(),DEC);
         //Serial.println(micros() - readTime, DEC);
       }
       
