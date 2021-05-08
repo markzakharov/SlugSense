@@ -127,6 +127,7 @@ void controlLed(BLEDevice peripheral) {
 
   // retrieve the LED characteristic
   BLECharacteristic ledCharacteristic = peripheral.characteristic("19b10001-e8f2-537e-4f6c-d104768a1214");
+  BLECharacteristic notifyCharacteristic = peripheral.characteristic("19b10003-e8f2-537e-4f6c-d104768a1214");
 
   if (!ledCharacteristic) {
     // Serial.println("Peripheral does not have LED characteristic!");
@@ -141,6 +142,24 @@ void controlLed(BLEDevice peripheral) {
   byte var = 0;
   uint32_t value;
 
+
+  // subscribe to the simple key characteristic
+  Serial.println("Subscribing to notify characteristic ...");
+  if (!ledCharacteristic) {
+    Serial.println("no notify characteristic found!");
+    peripheral.disconnect();
+    return;
+  } else if (!ledCharacteristic.canSubscribe()) {
+    Serial.println("notify characteristic is not subscribable!");
+    peripheral.disconnect();
+    return;
+  } else if (!ledCharacteristic.subscribe()) {
+    Serial.println("subscription failed!");
+    peripheral.disconnect();
+    return;
+  }
+
+
   while (peripheral.connected()) {
     // while the peripheral is connected
 
@@ -153,19 +172,19 @@ void controlLed(BLEDevice peripheral) {
       if(value != prevValue){
         prevValue = value;
         Serial.println(value);
-        if(value == 50) {  // RED ON
+        if(value == 2) {  // RED ON
           digitalWrite(RED, LOW);
           digitalWrite(GREEN, HIGH);
           digitalWrite(BLUE, HIGH);
-        } else if(value == 100) { // BLUE ON
+        } else if(value == 3) { // BLUE ON
           digitalWrite(RED, HIGH);
           digitalWrite(GREEN, HIGH);
           digitalWrite(BLUE, LOW);
-        } else if(value == 150) {  // GREEN ON
+        } else if(value == 4) {  // GREEN ON
           digitalWrite(RED, HIGH);
           digitalWrite(GREEN, LOW);
           digitalWrite(BLUE, HIGH);
-        } else if (value == 0) {  // ALL OFF
+        } else if (value == 1) {  // ALL OFF
           digitalWrite(RED, HIGH);
           digitalWrite(BLUE, HIGH);
           digitalWrite(GREEN, HIGH);

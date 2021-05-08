@@ -106,7 +106,7 @@ void max_distance(int slider1) {
   port.write(slider1);
   
 }
-void motor_intensity(int slider2) {
-  port.write(slider2);
+// void motor_intensity(int slider2) {
+//   port.write(slider2);
   
-}
+// }
