@@ -22,9 +22,9 @@
 #define DigitalReadPin 10
 #define RXCmdPin 9 // sends control signals to get sensor readings
 #define MicrosToInches 147  //digital width conversion, 147 microseconds per inch measured
-#define ArrayLength 10
+#define ArrayLength 5
 #define JumpThreshold 75
-#define AvgThreshold 2
+#define AvgThreshold 5
 #define ReadIntervalUs 100000 // delay between sensor readings (in us)
 
 #define RED 22     
@@ -176,22 +176,23 @@ void controlLed(BLEDevice peripheral) {
       //Serial.print("1 ");
       //Serial.println(micros(),DEC);
       
-      ledCharacteristic.readValue(maxDistance);
+      //ledCharacteristic.readValue(maxDistance);
       
       //Serial.print("2 ");
       //Serial.println(micros(),DEC);
       
       // SENSOR RUN
       if (micros() - readTime >= ReadIntervalUs) {
-      digitalWrite(RXCmdPin, HIGH);
+        digitalWrite(RXCmdPin, HIGH);
+        readTime = micros();
       }
 
 
       if(digitalRead(DigitalReadPin)){  //once pin goes high, enters function
-
+        digitalWrite(RXCmdPin, LOW);
         // DIGITAL WIDTH EVALUATION
         microTime = micros();   //reset inches
-        readTime = microTime;
+        //readTime = microTime;
         while(digitalRead(DigitalReadPin)){  //busy wait
         }
         microTime = micros()- microTime;  //sets inches to inches
@@ -205,27 +206,27 @@ void controlLed(BLEDevice peripheral) {
           movSum += inches;
           movIndex = (movIndex+1)%ArrayLength;
         }
-        //Serial.print(micros(),DEC);
-        //Serial.print(" , ");
+        Serial.print(micros(),DEC);
+        Serial.print(" , ");
         // Prints new result, new result is the sum divided by the array length= movSum/ArrayLength
         if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
-          //Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
+          Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
           oldAvg = movSum/ArrayLength;
           cycleCount++;
         }
         else if ((movSum/ArrayLength) > maxDistance*12){
-          //Serial.println("0");                    //new result is out of bounds
+          Serial.println("0");                    //new result is out of bounds
         }
         else{
-          //Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
+          Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
         }
         
-        digitalWrite(RXCmdPin, LOW);
+        
         
         
         //Serial.print("3 ");
         //Serial.println(micros(),DEC);
-        Serial.println(micros() - readTime, DEC);
+        //Serial.println(micros() - readTime, DEC);
       }
       
     //}
