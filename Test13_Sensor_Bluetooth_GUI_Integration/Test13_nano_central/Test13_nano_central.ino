@@ -227,18 +227,19 @@ void controlLed(BLEDevice peripheral) {
           Serial.print(micros(),DEC);
           Serial.print(" , ");
           // Prints new result, new result is the sum divided by the array length= movSum/ArrayLength
-          if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
+          if ((movSum/ArrayLength) > (maxDistance*12)){
+            Serial.println("0");                    //new result is out of bounds
+          }
+          else if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
             Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
             oldAvg = movSum/ArrayLength;
             cycleCount++;
-          }
-          else if ((movSum/ArrayLength) > maxDistance*12){
-            Serial.println("0");                    //new result is out of bounds
           }
           else{
             Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
           }
         }
+       
         
         
         
