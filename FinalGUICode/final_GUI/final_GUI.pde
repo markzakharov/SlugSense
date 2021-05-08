@@ -14,7 +14,7 @@ void setup() {  // same as Arduino program
 
 
 
-  size(325, 175);  // window size (width, height)
+  size(325, 215);  // window size (width, height)
   
   printArray(Serial.list());  // prints all available serial ports
   
@@ -66,7 +66,7 @@ void setup() {  // same as Arduino program
     ;
 
   cp5.addSlider("motor_intensity")
-    .setPosition(30, 120)
+    .setPosition(30, 140)
     .setSize(200, 30)
     .setRange(25, 100)
     .setNumberOfTickMarks(4)
@@ -82,6 +82,9 @@ void draw() {  // same as loop in Arduino
   textSize(20);
   textFont(font);
   text("SLUG SENSE GUI CONTROL", 30, 40);  // ("text", x-coord, y-coord)
+  textSize(16);
+  text("(feet)", 115, 115);
+  text("(%)", 120, 195);
 }
 
 // // Button Functions
@@ -106,7 +109,7 @@ void max_distance(int slider1) {
   port.write(slider1);
   
 }
-// void motor_intensity(int slider2) {
-//   port.write(slider2);
+void motor_intensity(int slider2) {
+  port.write(slider2);
   
-// }
+}
