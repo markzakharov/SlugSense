@@ -29,6 +29,7 @@ const int buttonPin = 2;
 int oldButtonState = LOW;
 
 int prevValue = 1;
+int prevValue2 = 25;
 
 void setup() {
   // put your setup code here, to run once:
@@ -127,7 +128,7 @@ void controlLed(BLEDevice peripheral) {
 
   // retrieve the LED characteristic
   BLECharacteristic ledCharacteristic = peripheral.characteristic("19b10001-e8f2-537e-4f6c-d104768a1214");
-  BLECharacteristic notifyCharacteristic = peripheral.characteristic("19b10003-e8f2-537e-4f6c-d104768a1214");
+  BLECharacteristic motorCharacteristic = peripheral.characteristic("19b10002-e8f2-537e-4f6c-d104768a1214");
 
   if (!ledCharacteristic) {
     // Serial.println("Peripheral does not have LED characteristic!");
@@ -139,22 +140,40 @@ void controlLed(BLEDevice peripheral) {
     return;
   }
 
-  byte var = 0;
-  uint32_t value;
-
-
-  // subscribe to the simple key characteristic
-  Serial.println("Subscribing to notify characteristic ...");
-  if (!ledCharacteristic) {
-    Serial.println("no notify characteristic found!");
+  if (!motorCharacteristic) {
+    // Serial.println("Peripheral does not have LED characteristic!");
     peripheral.disconnect();
     return;
-  } else if (!ledCharacteristic.canSubscribe()) {
+  } else if (!motorCharacteristic.canWrite()) {
+    // Serial.println("Peripheral does not have a writable LED characteristic!");
+    peripheral.disconnect();
+    return;
+  }
+
+  byte var = 0;
+  uint32_t value;
+  uint32_t value2;
+
+  // subscribe to the LED characteristic
+  Serial.println("Subscribing to notify characteristic ...");
+  if (!ledCharacteristic.canSubscribe()) {
     Serial.println("notify characteristic is not subscribable!");
     peripheral.disconnect();
     return;
   } else if (!ledCharacteristic.subscribe()) {
     Serial.println("subscription failed!");
+    peripheral.disconnect();
+    return;
+  }
+
+  // subscribe to the motor characteristic
+  Serial.println("Subscribing to motor characteristic ...");
+  if (!motorCharacteristic.canSubscribe()) {
+    Serial.println("motor characteristic is not subscribable!");
+    peripheral.disconnect();
+    return;
+  } else if (!motorCharacteristic.subscribe()) {
+    Serial.println("motor subscription failed!");
     peripheral.disconnect();
     return;
   }
@@ -166,29 +185,37 @@ void controlLed(BLEDevice peripheral) {
     // ledCharacteristic.writeValue(var);
     // var =  var + 1;
     if (ledCharacteristic.valueUpdated()) {
-      Serial.println("Value updated");
+      Serial.print("Distance value updated: ");
       ledCharacteristic.readValue(value);
       
       if(value != prevValue){
         prevValue = value;
         Serial.println(value);
-        if(value == 2) {  // RED ON
-          digitalWrite(RED, LOW);
-          digitalWrite(GREEN, HIGH);
-          digitalWrite(BLUE, HIGH);
-        } else if(value == 3) { // BLUE ON
-          digitalWrite(RED, HIGH);
-          digitalWrite(GREEN, HIGH);
-          digitalWrite(BLUE, LOW);
-        } else if(value == 4) {  // GREEN ON
-          digitalWrite(RED, HIGH);
-          digitalWrite(GREEN, LOW);
-          digitalWrite(BLUE, HIGH);
-        } else if (value == 1) {  // ALL OFF
-          digitalWrite(RED, HIGH);
-          digitalWrite(BLUE, HIGH);
-          digitalWrite(GREEN, HIGH);
-        }
+        // if(value == 2) {  // RED ON
+        //   digitalWrite(RED, LOW);
+        //   digitalWrite(GREEN, HIGH);
+        //   digitalWrite(BLUE, HIGH);
+        // } else if(value == 3) { // BLUE ON
+        //   digitalWrite(RED, HIGH);
+        //   digitalWrite(GREEN, HIGH);
+        //   digitalWrite(BLUE, LOW);
+        // } else if(value == 4) {  // GREEN ON
+        //   digitalWrite(RED, HIGH);
+        //   digitalWrite(GREEN, LOW);
+        //   digitalWrite(BLUE, HIGH);
+        // } else if (value == 1) {  // ALL OFF
+        //   digitalWrite(RED, HIGH);
+        //   digitalWrite(BLUE, HIGH);
+        //   digitalWrite(GREEN, HIGH);
+        // }
+      }
+    } else if (motorCharacteristic.valueUpdated())  {
+      Serial.print("Motor value updated: ");
+      motorCharacteristic.readValue(value2);
+      
+      if(value2 != prevValue2){
+        prevValue2 = value2;
+        Serial.println(value2);
       }
     }
     // Serial.println(value);

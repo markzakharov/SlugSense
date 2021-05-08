@@ -22,7 +22,7 @@ BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Servic
 
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
 BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify);
-BLEByteCharacteristic motorCharacteristic("19B10002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
+BLEByteCharacteristic motorCharacteristic("19B10002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify);
 BLEByteCharacteristic notifyCharacteristic("19B10003-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED

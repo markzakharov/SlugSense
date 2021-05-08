@@ -151,26 +151,33 @@ void controlLed(BLEDevice peripheral) {
     return;
   }
 
-  // retrieve the LED characteristic
+  // retrieve the characteristics
   BLECharacteristic ledCharacteristic = peripheral.characteristic("19b10001-e8f2-537e-4f6c-d104768a1214");
+  BLECharacteristic motorCharacteristic = peripheral.characteristic("19b10002-e8f2-537e-4f6c-d104768a1214");
 
   if (!ledCharacteristic) {
-    // Serial.println("Peripheral does not have LED characteristic!");
+    Serial.println("Peripheral does not have LED characteristic!");
     peripheral.disconnect();
     return;
   } else if (!ledCharacteristic.canWrite()) {
-    // Serial.println("Peripheral does not have a writable LED characteristic!");
+    Serial.println("Peripheral does not have a writable LED characteristic!");
     peripheral.disconnect();
     return;
   }
 
-  // subscribe to the simple key characteristic
-  Serial.println("Subscribing to notify characteristic ...");
-  if (!ledCharacteristic) {
-    Serial.println("no notify characteristic found!");
+  if (!motorCharacteristic) {
+    Serial.println("Peripheral does not have motor characteristic!");
     peripheral.disconnect();
     return;
-  } else if (!ledCharacteristic.canSubscribe()) {
+  } else if (!motorCharacteristic.canWrite()) {
+    Serial.println("Peripheral does not have a writable motor characteristic!");
+    peripheral.disconnect();
+    return;
+  }
+
+  // subscribe to the LED characteristic
+  Serial.println("Subscribing to notify characteristic ...");
+  if (!ledCharacteristic.canSubscribe()) {
     Serial.println("notify characteristic is not subscribable!");
     peripheral.disconnect();
     return;
@@ -180,22 +187,41 @@ void controlLed(BLEDevice peripheral) {
     return;
   }
 
+  // subscribe to the motor characteristic
+  Serial.println("Subscribing to motor characteristic ...");
+  if (!motorCharacteristic.canSubscribe()) {
+    Serial.println("motor characteristic is not subscribable!");
+    peripheral.disconnect();
+    return;
+  } else if (!motorCharacteristic.subscribe()) {
+    Serial.println("motor subscription failed!");
+    peripheral.disconnect();
+    return;
+  }
+
   byte var = 0;
-  uint32_t maxDistance=1;
+  uint32_t maxDistance = 1; // init maxDistance setting value
+  uint32_t motorIntensity = 25; // init motorIntensity setting value
 
   while (peripheral.connected()) {
     // while the peripheral is connected
 
     // ledCharacteristic.writeValue(var);
     // var =  var + 1;
-    if (ledCharacteristic.valueUpdated()) {
+    if (ledCharacteristic.valueUpdated()) { // checking if new distance value setting
       //Serial.print("1 ");
       //Serial.println(micros(),DEC);
-      // Serial.print("Value updated: ");
-      ledCharacteristic.readValue(maxDistance);
+      ledCharacteristic.readValue(maxDistance); // read distance setting value
+      // Serial.print("Distance value updated: ");
       // Serial.println(maxDistance);
-    } 
-    else{ 
+
+    } else if (motorCharacteristic.valueUpdated())  { // checking if new motor value setting
+
+      motorCharacteristic.readValue(motorIntensity); // read motor setting value
+      // Serial.print("Motor value updated: ");
+      // Serial.println(motorIntensity);
+
+    } else{ 
         //Serial.print("2 ");
         //Serial.println(micros(),DEC);
         
