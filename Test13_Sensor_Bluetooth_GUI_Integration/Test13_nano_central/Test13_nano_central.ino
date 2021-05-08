@@ -194,50 +194,51 @@ void controlLed(BLEDevice peripheral) {
       // Serial.print("Value updated: ");
       ledCharacteristic.readValue(maxDistance);
       // Serial.println(maxDistance);
-    }  
-      //Serial.print("2 ");
-      //Serial.println(micros(),DEC);
-      
-      // SENSOR RUN
-      if (micros() - readTime >= ReadIntervalUs) {
-        digitalWrite(RXCmdPin, HIGH);
-        readTime = micros();
-      }
-
-
-      if(digitalRead(DigitalReadPin)){  //once pin goes high, enters function
-        digitalWrite(RXCmdPin, LOW);
-        // DIGITAL WIDTH EVALUATION
-        microTime = micros();   //reset inches
-        //readTime = microTime;
-        while(digitalRead(DigitalReadPin)){  //busy wait
-        }
-        microTime = micros()- microTime;  //sets inches to inches
-        inches = (uint32_t) microTime/MicrosToInches;
-        //inches_analog = (uint32_t) (analogRead(AnalogReadPin)/AnalogToInches);
-      
-        // Apply digital moving filter
-        if(((movAvg[movIndex]-JumpThreshold) < inches) || ((movAvg[movIndex]+JumpThreshold) > inches) || (movAvg[movIndex]==0)){  //independent reading threshold
-          movSum = movSum - movAvg[movIndex];
-          movAvg[movIndex] = inches;
-          movSum += inches;
-          movIndex = (movIndex+1)%ArrayLength;
-        }
-        Serial.print(micros(),DEC);
-        Serial.print(" , ");
-        // Prints new result, new result is the sum divided by the array length= movSum/ArrayLength
-        if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
-          Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
-          oldAvg = movSum/ArrayLength;
-          cycleCount++;
-        }
-        else if ((movSum/ArrayLength) > maxDistance*12){
-          Serial.println("0");                    //new result is out of bounds
-        }
-        else{
-          Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
-        }
+    } 
+    else{ 
+        //Serial.print("2 ");
+        //Serial.println(micros(),DEC);
         
+        // SENSOR RUN
+        if (micros() - readTime >= ReadIntervalUs) {
+          digitalWrite(RXCmdPin, HIGH);
+          readTime = micros();
+        }
+  
+  
+        if(digitalRead(DigitalReadPin)){  //once pin goes high, enters function
+          digitalWrite(RXCmdPin, LOW);
+          // DIGITAL WIDTH EVALUATION
+          microTime = micros();   //reset inches
+          //readTime = microTime;
+          while(digitalRead(DigitalReadPin)){  //busy wait
+          }
+          microTime = micros()- microTime;  //sets inches to inches
+          inches = (uint32_t) microTime/MicrosToInches;
+          //inches_analog = (uint32_t) (analogRead(AnalogReadPin)/AnalogToInches);
+        
+          // Apply digital moving filter
+          if(((movAvg[movIndex]-JumpThreshold) < inches) || ((movAvg[movIndex]+JumpThreshold) > inches) || (movAvg[movIndex]==0)){  //independent reading threshold
+            movSum = movSum - movAvg[movIndex];
+            movAvg[movIndex] = inches;
+            movSum += inches;
+            movIndex = (movIndex+1)%ArrayLength;
+          }
+          Serial.print(micros(),DEC);
+          Serial.print(" , ");
+          // Prints new result, new result is the sum divided by the array length= movSum/ArrayLength
+          if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
+            Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
+            oldAvg = movSum/ArrayLength;
+            cycleCount++;
+          }
+          else if ((movSum/ArrayLength) > maxDistance*12){
+            Serial.println("0");                    //new result is out of bounds
+          }
+          else{
+            Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
+          }
+        }
         
         
         
