@@ -16,7 +16,6 @@
 
 #include <ArduinoBLE.h>
 
-byte value = 0;
 const int ledPin = 12; // pin to use for the LED
 
 void setup() {
@@ -56,13 +55,13 @@ void explorerPeripheral(BLEDevice peripheral) {
 
   if (peripheral.connect()) {
     Serial.println("Connected");
-
-      BLEByteCharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
+      uint32_t value;
+      BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
       while (peripheral.connected()) {
           //BLECharacteristic ledCharacteristic = peripheral.characteristic("19B10001-E8F2-537E-4F6C-D104768A1214");
-          int var = (int) ledCharacteristic.value();
-          Serial.print(var);
-          /*if (ledCharacteristic.value()) {
+          ledCharacteristic.readValue(value);
+          Serial.println(value);
+          /*if (value) {
             Serial.println("Write High");
             //digitalWrite(ledPin, HIGH);
           } else {

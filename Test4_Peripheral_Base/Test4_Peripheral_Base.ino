@@ -72,16 +72,17 @@ void loop() {
       // if the remote device wrote to the characteristic,
       // use the value to control the LED:
       
-      Serial.println("LED on");
-      switchCharacteristic.writeValue((byte)0x01);
+      //Serial.println("LED on");
+      switchCharacteristic.writeValue(1);
       int var = (int) switchCharacteristic.value();
       Serial.println(var);
-      //delay(1000);
-      Serial.println("LED off");
-      switchCharacteristic.writeValue((byte)0x02);
+      delay(1000);
+      
+      //Serial.println("LED off");
+      switchCharacteristic.writeValue(0);
       var = (int) switchCharacteristic.value();
       Serial.println(var);
-      //delay(1000);
+      delay(1000);
 
       /*
       if (switchCharacteristic.written()) {
