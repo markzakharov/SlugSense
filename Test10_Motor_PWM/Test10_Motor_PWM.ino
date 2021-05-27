@@ -11,7 +11,7 @@ mbed::PwmOut pollSensor(digitalPinToPinName(PWM_OUT));
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pollSensor.period(0.01f);
+  pollSensor.period(1);
 }
 
 void loop() {

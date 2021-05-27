@@ -19,7 +19,7 @@ void setup() {  // same as Arduino program
   printArray(Serial.list());  // prints all available serial ports
   
   // DON'T FORGET TO CHANGE COM PORT!!
-  port = new Serial(this, "/dev/cu.usbmodem14201", 9600);  // Arduino connected to this port, peripheral
+  port = new Serial(this, "COM7", 9600);  // Arduino connected to this port, peripheral
   
   cp5 = new ControlP5(this);
   font = createFont("Times", 20);

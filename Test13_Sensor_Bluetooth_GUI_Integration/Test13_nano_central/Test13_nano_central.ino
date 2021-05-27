@@ -15,17 +15,22 @@
 
   This example code is in the public domain.
 */
-
+#include "mbed.h"
 #include <ArduinoBLE.h>
+// MATLAB OUTPUT PIN
+#define MatLabPin A0
 
 // SENSOR DEFINES
 #define DigitalReadPin 10
 #define RXCmdPin 9 // sends control signals to get sensor readings
 #define MicrosToInches 147  //digital width conversion, 147 microseconds per inch measured
-#define ArrayLength 5
+#define ArrayLength 10
 #define JumpThreshold 75
 #define AvgThreshold 5
 #define ReadIntervalUs 100000 // delay between sensor readings (in us)
+#define MinSensorDistance 5 //sensor cannot read below 6 inches
+
+#define PWM_OUT D3
 
 #define RED 22     
 #define BLUE 24  
@@ -50,7 +55,11 @@ int oldButtonState = LOW;
 
 int prevValue = 1;
 
+mbed::PwmOut pollSensor(digitalPinToPinName(PWM_OUT));
+
 void setup() {
+  pollSensor.period(1); //PWM freq should be as low as possible so op amp GBP is maximized
+  
   // SENSOR INITS
   Serial.begin(9600);
   pinMode(DigitalReadPin,INPUT);
@@ -202,7 +211,8 @@ void controlLed(BLEDevice peripheral) {
   byte var = 0;
   uint32_t maxDistance = 1; // init maxDistance setting value
   uint32_t motorIntensity = 25; // init motorIntensity setting value
-
+  float motorValue = 1.0; //turned off
+  
   while (peripheral.connected()) {
     // while the peripheral is connected
 
@@ -250,32 +260,46 @@ void controlLed(BLEDevice peripheral) {
             movSum += inches;
             movIndex = (movIndex+1)%ArrayLength;
           }
-          Serial.print(micros(),DEC);
-          Serial.print(" , ");
+          //Serial.print(micros(),DEC);
+          //Serial.print(" , ");
           // Prints new result, new result is the sum divided by the array length= movSum/ArrayLength
           if ((movSum/ArrayLength) > (maxDistance*12)){
-            Serial.println("0");                    //new result is out of bounds
+            Serial.println(0);                    //new result is out of bounds
+            oldAvg = movSum/ArrayLength;
+            cycleCount++;
           }
           else if(((oldAvg-AvgThreshold) < (movSum/ArrayLength)) || ((oldAvg+AvgThreshold) > (movSum/ArrayLength)) || (cycleCount<1000)){ //moving average threshold
-            Serial.println(movSum/ArrayLength, DEC);  //new result is reasonable
+            Serial.println(movSum/ArrayLength);  //new result is reasonable
             oldAvg = movSum/ArrayLength;
             cycleCount++;
           }
           else{
-            Serial.println(oldAvg, DEC);            //new result is noise, ignored and previous result is kept
+            Serial.println(oldAvg);            //new result is noise, ignored and previous result is kept
+            cycleCount++;
           }
+
+          motorValue = static_cast<float>(oldAvg - MinSensorDistance)/static_cast<float>(maxDistance*12);
+          
+          // UPDATE MOTOR FREQUENCY
+          if(motorValue < 0.0){
+            motorValue = 0.0;
+          }
+          else if((motorValue > 1.0) || (oldAvg > (maxDistance*12))){
+            motorValue = 1.0;
+          }
+          //motorValue = motorValue*(static_cast<float>(motorIntensity)/static_cast<float>(100.0));
+          pollSensor.write(motorValue); //writes new value to PWM
+          //Serial.print(" , ");
+          //Serial.print(motorValue);
+          //Serial.print(" , ");
+          //Serial.println(maxDistance);
         }
+
+        
        
-        
-        
-        
-        // Serial.print("3 ");
-        // Serial.println(micros(),DEC);
-        //Serial.println(micros() - readTime, DEC);
       }
       
-    //}
-    // Serial.println(value);
+    
 
     // read the button pin
     //int buttonState = digitalRead(buttonPin);
