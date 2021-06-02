@@ -17,8 +17,17 @@
 */
 #include "mbed.h"
 #include <ArduinoBLE.h>
-// MATLAB OUTPUT PIN
-#define MatLabPin A0
+
+// Motor Intensity LookUp Table for quick, consistent results
+float FullIntensity [20] = {0.0, 0.02, 0.05, 0.08, 0.11,
+                            0.14, 0.16, 0.18, 0.20, 0.22,
+                             0.24, 0.28, 0.32, 0.36, 0.40,
+                             0.44, 0.48, 0.52, 0.56, 1.0};
+                             
+float HalfIntensity [20] = {0.25, 0.26, 0.27, 0.28, 0.29,
+                            0.31, 0.33, 0.35, 0.37, 0.39,
+                            0.41, 0.43, 0.45, 0.47, 0.49,
+                            0.51, 0.54, 0.56, 0.56, 1.0};
 
 // SENSOR DEFINES
 #define DigitalReadPin 10
@@ -278,19 +287,45 @@ void controlLed(BLEDevice peripheral) {
             cycleCount++;
           }
 
-          motorValue = static_cast<float>(oldAvg - MinSensorDistance)/static_cast<float>(maxDistance*12);
-          
+          motorValue = static_cast<float>(oldAvg - MinSensorDistance)/static_cast<float>(maxDistance*12) * 19;
+          int LUTvalue = motorValue;
+          //motorValue = motorValue*(static_cast<float>(100.0)/static_cast<float>(motorIntensity));
           // UPDATE MOTOR FREQUENCY
-          if(motorValue < 0.0){
+          /*if(motorValue < 0.0){
             motorValue = 0.0;
           }
           else if((motorValue > 1.0) || (oldAvg > (maxDistance*12))){
             motorValue = 1.0;
+          }*/
+          if(LUTvalue < 0){
+            LUTvalue = 0;
           }
-          //motorValue = motorValue*(static_cast<float>(motorIntensity)/static_cast<float>(100.0));
-          pollSensor.write(motorValue); //writes new value to PWM
+          else if((LUTvalue > 19) || (oldAvg > (maxDistance*12))){
+            LUTvalue = 19;
+          }
+          else if((LUTvalue >= 19) && (oldAvg < (maxDistance*12))){
+            LUTvalue = 18;
+          }
+
+          if(motorIntensity == 50){
+            pollSensor.write(HalfIntensity[LUTvalue]);
+          }
+          else{
+            pollSensor.write(FullIntensity[LUTvalue]);
+          }
+          /*if(motorIntensity == 75){
+            motorValue = motorValue*1.2;
+          }
+          else if(motorIntensity == 50){
+            motorValue = motorValue*1.3;
+          }
+          else if(motorIntensity == 25){
+            motorValue = motorValue*1.4;
+          }*/
+          
+          //pollSensor.write(motorValue); //writes new value to PWM
           //Serial.print(" , ");
-          //Serial.print(motorValue);
+          //Serial.println(LUTvalue);
           //Serial.print(" , ");
           //Serial.println(maxDistance);
         }
